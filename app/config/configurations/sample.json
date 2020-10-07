@@ -1,0 +1,8 @@
+{
+  "REFRESH_TIME": 1,
+  "POE_URL" : "https://www.pathofexile.com",
+  "STASH_API_URL": "/character-window/get-stash-items",
+  "POESESSID": "",
+  "ACCOUNT": "",
+  "LEAGUE": ""
+}

@@ -1,0 +1,33 @@
+{
+  "name": "poe-recipe-helper",
+  "version": "1.0.0",
+  "description": "overlay with recipes for poe",
+  "main": "./app/main.js",
+  "scripts": {
+    "start": "electron ./app/main.js",
+    "dev": "electron -r dotenv/config ./app/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dudovelha/poe-recipe-helper.git"
+  },
+  "author": "dudovelha",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dudovelha/poe-recipe-helper/issues"
+  },
+  "homepage": "https://github.com/dudovelha/poe-recipe-helper#readme",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "nedb": "^1.8.0",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "electron": "^10.1.3",
+    "eslint": "^7.10.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}
