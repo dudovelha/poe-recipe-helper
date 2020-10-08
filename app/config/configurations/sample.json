@@ -1,6 +1,8 @@
 {
   "REFRESH_TIME": 1,
   "POE_URL" : "https://www.pathofexile.com",
+  "POE_NINJA_URL" : "https://poe.ninja",
+  "ITEM_TYPE_URL" : "/api/data/itemoverview",
   "STASH_API_URL": "/character-window/get-stash-items",
   "POESESSID": "",
   "ACCOUNT": "",

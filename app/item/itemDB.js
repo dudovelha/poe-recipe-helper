@@ -1,60 +1,33 @@
 const Datastore = require('nedb');
-const { config, logger } = require('../config/manager');
+const { logger } = require('../config/manager');
+const itemAdapter = require('./itemAdapter');
 
 const handleError = (err) => { if (err) logger.error(err.toString()); };
-const db = new Datastore({ filename: `${__dirname}/item.db`, autoload: true });
+const db = {};
+db.item = new Datastore({ filename: `${__dirname}/item.db`, autoload: true });
+db.itemType = new Datastore({ filename: `${__dirname}/itemType.db`, autoload: true });
 
-db.ensureIndex({ fieldName: 'id', unique: true, sparse: true }, handleError);
-
-function convertFrameType(frameType) {
-  switch (frameType) {
-    case 0:
-      return 'normal';
-    case 1:
-      return 'magic';
-    case 2:
-      return 'rare';
-    case 3:
-      return 'unique';
-    case 4:
-      return 'gem';
-    case 5:
-      return 'currency';
-    case 6:
-      return 'divination card';
-    case 7:
-      return 'quest item';
-    case 8:
-      return 'prophecy';
-    case 9:
-      return 'relic';
-    default:
-      return 'unknown';
-  }
-}
-
-function convertName(name, typeLine) {
-  return [name, typeLine].filter((string) => string).join(' ');
-}
-
-function convertItem(item) {
-  return {
-    size: { w: item.w, h: item.h },
-    position: { x: item.x, y: item.y },
-    stashId: item.stashId,
-    name: convertName(item.name, item.typeLine),
-    identified: item.identified,
-    ilvl: item.ilvl,
-    type: convertFrameType(item.frameType),
-    corrupted: item.corrupted,
-    id: item.id,
-  };
-}
+db.item.ensureIndex({ fieldName: 'id', unique: true, sparse: true }, handleError);
+db.itemType.ensureIndex({ fieldName: 'id', unique: true, sparse: true }, handleError);
 
 class ItemDB {
   static updateItem(item) {
     return new Promise((resolse, reject) => {
-      db.update({ id: item.id }, convertItem(item), {}, (err, numReplaced) => {
+      const convertedItem = itemAdapter.toItem(item);
+      db.item.update({ id: item.id }, convertedItem, {}, (err, numReplaced) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolse(numReplaced);
+        }
+      });
+    });
+  }
+
+  static updateItemType(itemType) {
+    return new Promise((resolse, reject) => {
+      const convertedItemType = itemAdapter.toItemType(itemType);
+      db.itemType.update({ id: itemType.id }, convertedItemType, {}, (err, numReplaced) => {
         if (err) {
           reject(err);
         } else {
@@ -65,31 +38,24 @@ class ItemDB {
   }
 
   static insertItem(item) {
-    db.insert(convertItem(item), handleError);
+    db.item.insert(itemAdapter.toItem(item), handleError);
+  }
+
+  static insertItemType(itemType) {
+    db.itemType.insert(itemAdapter.toItemType(itemType), handleError);
   }
 
   static insertItems(items) {
     items.forEach(this.insertStashTab);
   }
 
-  static insertOrUpdateItem(item) {
-    return new Promise((resolve, reject) => {
-      this.getitem({ id: item.id }).then((itemInDb) => {
-        if (itemInDb) {
-          logger.info(`updating item ${item.n}`);
-          this.updateStashTab(item).then(resolve).catch(reject);
-        } else {
-          logger.info(`inserting stash ${item.n}`);
-          this.insertStashTab(item);
-          resolve();
-        }
-      });
-    });
+  static insertItemTypes(itemTypes) {
+    itemTypes.forEach(this.insertStashTab);
   }
 
   static getItem(itemProps) {
     return new Promise((resolve, reject) => {
-      db.findOne(itemProps, (err, docs) => {
+      db.item.findOne(itemProps, (err, docs) => {
         if (err) {
           reject(err);
         } else {
@@ -101,11 +67,59 @@ class ItemDB {
 
   static getItems() {
     return new Promise((resolve, reject) => {
-      db.find({}, (err, docs) => {
+      db.item.find({}, (err, docs) => {
         if (err) {
           reject(err);
         } else {
           resolve(docs);
+        }
+      });
+    });
+  }
+
+  static getItemType(itemTypeProps) {
+    return new Promise((resolve, reject) => {
+      db.itemType.findOne(itemTypeProps, (err, docs) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(docs);
+        }
+      });
+    });
+  }
+
+  static getItemTypes() {
+    return new Promise((resolve, reject) => {
+      db.itemType.find({}, (err, docs) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(docs);
+        }
+      });
+    });
+  }
+
+  static countItems() {
+    return new Promise((resolve, reject) => {
+      db.item.count({}, (err, count) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(count);
+        }
+      });
+    });
+  }
+
+  static countItemTypes() {
+    return new Promise((resolve, reject) => {
+      db.itemType.count({}, (err, count) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(count);
         }
       });
     });

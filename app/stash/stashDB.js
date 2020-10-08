@@ -1,5 +1,5 @@
 const Datastore = require('nedb');
-const { config, logger } = require('../config/manager');
+const { logger } = require('../config/manager');
 
 const handleError = (err) => { if (err) logger.error(err.toString()); };
 const db = new Datastore({ filename: `${__dirname}/stash.db`, autoload: true });
@@ -55,6 +55,18 @@ class StashDB {
           reject(err);
         } else {
           resolve(docs);
+        }
+      });
+    });
+  }
+
+  static countStashTabs() {
+    return new Promise((resolve, reject) => {
+      db.count({}, (err, count) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(count);
         }
       });
     });

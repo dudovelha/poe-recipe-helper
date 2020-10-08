@@ -1,8 +1,5 @@
 const axios = require('axios');
 const Datastore = require('nedb');
-const fs = require('fs');
-
-fs.writeFileSync(`${__dirname}/requests.db`, '');
 
 const db = new Datastore({ filename: `${__dirname}/requests.db`, autoload: true, timestampData: true });
 const isCache = process.env.NODE_ENV === 'development';
@@ -55,16 +52,17 @@ async function requestInterceptor(request, logger) {
       });
     }
   }
-  logger.info(`${cachedResponse ? 'CACHE: ' : ''}requesting ${request.method} to ${request.url}`);
+  logger.info(`${cachedResponse ? 'CACHE FOUND: ' : ''}requesting ${request.method} to ${request.url}`);
   return request;
 }
 
 async function responseInterceptor(response, logger) {
-  if (isCache && !response.cached) {
+  const shouldCache = isCache && !response.cached;
+  if (shouldCache) {
     const key = buildRequestUrl(response.config);
     setCacheResponse(key, response, logger);
   }
-  logger.info(`${isCache ? 'CACHED: ' : ''} response status ${response.status} from ${response.config.url}`);
+  logger.info(`${shouldCache ? 'CACHED: ' : ''}${response.cached ? 'FROM CACHE ' : ''}response status ${response.status} from ${response.config.url}`);
   return response;
 }
 
@@ -74,7 +72,7 @@ function requestError(error, logger) {
 }
 
 function responseError(error, logger) {
-  logger.error(`response status ${error.status} from ${error.config.url}`);
+  logger.error(`response status ${error.response.status} from ${error.config.url}`);
   return Promise.reject(error);
 }
 
@@ -90,13 +88,7 @@ function configureAxiosInterceptors(instance, logger) {
 }
 
 function createInstance(logger, config) {
-  const instance = axios.create({
-    baseURL: config.POE_URL,
-    timeout: 1000,
-    headers: {
-      Cookie: `POESESSID=${config.POESESSID}`,
-    },
-  });
+  const instance = axios.create(config);
 
   configureAxiosInterceptors(instance, logger);
   return instance;

@@ -8,7 +8,7 @@ class StashFacade {
     let stashes = await stashDB.getStashTabs();
     if (stashes.length === 0) {
       logger.warn('stashes not loaded');
-      this.updateStashTabs();
+      await this.updateStashTabs();
       stashes = await StashDB.getStashTabs();
     }
     return stashes;
@@ -17,34 +17,31 @@ class StashFacade {
   static async getStash(stashProps) {
     let stash = await stashDB.getStashTab(stashProps);
     if (!stash) {
-      logger.warn(`could not find stash: ${JSON.stringify(stashProps)}`);
-      this.updateStashTabs();
+      logger.warn(`could not find stash in db: ${JSON.stringify(stashProps)}`);
+      await this.updateStashTabs();
       stash = await stashDB.getStashTab(stashProps);
     }
     return stash;
   }
 
-  static insertOrUpdateStahTab(stash) {
-    return new Promise((resolve, reject) => {
-      stashDB.getStashTab({ id: stash.id }).then((stashInDb) => {
-        if (stashInDb) {
-          logger.info(`updating stash ${stash.n}`);
-          stashDB.updateStashTab(stash).then(resolve).catch(reject);
-        } else {
-          logger.info(`inserting stash ${stash.n}`);
-          stashDB.insertStashTab(stash);
-          resolve();
-        }
-      });
-    });
+  static async insertOrUpdateStahTab(stash) {
+    const stashInDb = await stashDB.getStashTab({ id: stash.id });
+    if (stashInDb) {
+      logger.info(`updating stash ${stash.n}`);
+      await stashDB.updateStashTab(stash);
+    } else {
+      logger.info(`inserting stash ${stash.n}`);
+      stashDB.insertStashTab(stash);
+    }
   }
 
-  static async updateStashTabs() {
-    const stashes = await stashAPI.getStashTabs();
-    if (stashes) {
-      stashes.forEach(async (stash) => {
-        await this.insertOrUpdateStahTab(stash);
-      });
+  static async updateStashTabs(forceUpdate) {
+    const hasStashTabs = await stashDB.countStashTabs() > 0;
+    if (!hasStashTabs || forceUpdate) {
+      const stashes = await stashAPI.getStashTabs();
+      if (stashes) {
+        await Promise.all(stashes.map(this.insertOrUpdateStahTab));
+      }
     }
   }
 }

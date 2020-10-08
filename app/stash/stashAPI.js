@@ -21,7 +21,7 @@ class StashAPI {
   static async getStashTabs() {
     let response; let stashTabs;
     try {
-      response = await axios.get(config.STASH_API_URL, getRequestConfig());
+      response = await axios.poe.get(config.STASH_API_URL, getRequestConfig());
       stashTabs = response.data.tabs;
     } catch (err) {
       stashTabs = null;
@@ -32,7 +32,7 @@ class StashAPI {
   static async getStashTab(tab) {
     let response; let stashTab;
     try {
-      response = await axios.get(config.STASH_API_URL, getRequestConfig(tab));
+      response = await axios.poe.get(config.STASH_API_URL, getRequestConfig(tab));
       stashTab = response.data;
       delete (stashTab.tabs);
       delete (stashTab.numTabs);
