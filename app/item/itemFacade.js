@@ -14,50 +14,6 @@ function removeDuplicates(array) {
 }
 
 class ItemFacade {
-  static async addItemTypeToItem(item) {
-    const newItem = item;
-    const itemType = await itemDB.getItemType({ baseType: item.typeLine });
-    if (itemType) {
-      newItem.itemType = itemType.itemType;
-    }
-    return newItem;
-  }
-
-  static async getItemsFromStash(stash) {
-    const items = await itemAPI.getItemsFromTab(stash.i);
-    const itemsWithStashIds = [];
-    items.forEach((item) => {
-      itemsWithStashIds.push({
-        stashId: stash.id,
-        ...item,
-      });
-    });
-    return itemsWithStashIds;
-  }
-
-  static async getItemsFromStashes(stashes) {
-    return Promise.all(stashes.map(this.getItemsFromStash));
-  }
-
-  static async updateItems() {
-    const stashes = await stashFacade.getStashes();
-    const itemsArray = await this.getItemsFromStashes(stashes);
-    const items = itemsArray.reduce((list, itemList) => list.concat(itemList), []);
-    const itemsWithType = await Promise.all(items.map(this.addItemTypeToItem));
-    return Promise.all(itemsWithType.map(this.insertOrUpdateItem));
-  }
-
-  static async updateItemTypes(forceUpdate) {
-    const hasItemTypes = await itemDB.countItemTypes() > 0;
-    if (!hasItemTypes || forceUpdate) {
-      const itemTypes = await itemAPI.getItemTypes();
-      if (itemTypes) {
-        const nonDuplicatedItemTypes = removeDuplicates(itemTypes);
-        await Promise.all(nonDuplicatedItemTypes.map(this.insertOrUpdateItemType));
-      }
-    }
-  }
-
   static async insertOrUpdateItem(item) {
     const itemInDb = await itemDB.getItem({ id: item.id });
     if (itemInDb) {
@@ -78,6 +34,56 @@ class ItemFacade {
       logger.info(`inserting itemType ${itemType.name}`);
       itemDB.insertItemType(itemType);
     }
+  }
+
+  static async addItemTypeToItem(item) {
+    const newItem = item;
+    const itemType = await itemDB.getItemType({ baseType: item.typeLine });
+    if (itemType) {
+      newItem.itemType = itemType.itemType;
+    }
+    return newItem;
+  }
+
+  static async getUpdatedItemsFromStash(stash) {
+    const items = await itemAPI.getItemsFromTab(stash.i);
+    const itemsWithStashIds = [];
+    items.forEach((item) => {
+      itemsWithStashIds.push({
+        stashId: stash.id,
+        ...item,
+      });
+    });
+    return Promise.all(itemsWithStashIds.map(this.addItemTypeToItem.bind(this)));
+  }
+
+  static async getUpdatedItemsFromStashes(stashes) {
+    return Promise.all(stashes.map(this.getUpdatedItemsFromStash.bind(this)));
+  }
+
+  static async updateItems(forceUpdate) {
+    const hasItems = await itemDB.countItems() > 0;
+    if (!hasItems || forceUpdate) {
+      const stashes = await stashFacade.getStashes();
+      const itemsArray = await this.getUpdatedItemsFromStashes(stashes);
+      const items = itemsArray.reduce((list, itemList) => list.concat(itemList), []);
+      await Promise.all(items.map(this.insertOrUpdateItem.bind(this)));
+    }
+  }
+
+  static async updateItemTypes(forceUpdate) {
+    const hasItemTypes = await itemDB.countItemTypes() > 0;
+    if (!hasItemTypes || forceUpdate) {
+      const itemTypes = await itemAPI.getItemTypes();
+      if (itemTypes) {
+        const nonDuplicatedItemTypes = removeDuplicates(itemTypes);
+        await Promise.all(nonDuplicatedItemTypes.map(this.insertOrUpdateItemType.bind(this)));
+      }
+    }
+  }
+
+  static async getItemsFromStash(stash) {
+    return itemDB.getItems({ stashId: stash.id });
   }
 }
 

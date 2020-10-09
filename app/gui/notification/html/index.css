@@ -1,0 +1,13 @@
+body {
+  margin: 0px;
+}
+
+.highlight {
+  border: 1px solid darkslateblue;
+  background-color: #8080804D;
+  border-radius: 5px;
+}
+
+.highlighted {
+  background-color:  #808080c0 !important;
+}

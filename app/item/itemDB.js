@@ -65,9 +65,10 @@ class ItemDB {
     });
   }
 
-  static getItems() {
+  static getItems(itemsProps) {
+    const props = itemsProps || {};
     return new Promise((resolve, reject) => {
-      db.item.find({}, (err, docs) => {
+      db.item.find(props, (err, docs) => {
         if (err) {
           reject(err);
         } else {

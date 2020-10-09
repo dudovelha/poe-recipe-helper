@@ -3,3 +3,4 @@ app/config/config.json
 **/*.db
 .env
 **/*.log
+**/*.png

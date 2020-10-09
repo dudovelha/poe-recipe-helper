@@ -1,0 +1,27 @@
+{
+  "1_CHAOS_RECIPE": {
+    "common": {
+      "ilvl": [60, 74],
+      "rarity": "rare"
+    },
+    "items": [{ "itemType": "Boots" }, { "itemType": "Helmet"}, { "itemType": "Body Armour" }, { "itemType": "Gloves"}, { "itemType": "Belt"}, { "itemType": "Amulet"}, { "itemType": "Ring", "n": 2 },
+      [
+        { "itemType": ["Two Handed Axe", "Two Handed Sword", "Two Handed Mace", "Staff"] },
+        { "itemType": ["One Handed Mace", "One Handed Sword", "One Handed Axe", "Wand", "Dagger", "Claw", "Shield"], "n": 2}
+      ]
+    ]
+  },
+  "2_CHAOS_RECIPE": {
+    "common": {
+      "ilvl": [60, 74],
+      "identified": false
+    }
+  },
+  "3_CHAOS_RECIPE": {
+    "common": {
+      "ilvl": [60, 74],
+      "identified": false,
+      "quality": 20
+    }
+  }
+}

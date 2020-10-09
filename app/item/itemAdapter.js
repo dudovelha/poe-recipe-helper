@@ -1,5 +1,3 @@
-const logger = require('../config/configurations/logger');
-
 function convertFrameType(frameType) {
   switch (frameType) {
     case 0:
@@ -27,10 +25,6 @@ function convertFrameType(frameType) {
   }
 }
 
-function convertName(name, typeLine) {
-  return [name, typeLine].filter((string) => string).join(' ');
-}
-
 function getProperty(name, item) {
   if (!item.properties) return '';
   const property = item.properties.find((prop) => prop.name === name);
@@ -56,13 +50,17 @@ function convertInfluences(influences) {
   return newInfluence;
 }
 
-class itemAdapter {
+class ItemAdapter {
+  static concatenateName(name, typeLine) {
+    return [name, typeLine].filter((string) => string).join(' ');
+  }
+
   static toItem(item) {
     const newItem = {
       stashId: item.stashId,
       size: { w: item.w, h: item.h },
       position: { x: item.x, y: item.y },
-      fullName: convertName(item.name, item.typeLine),
+      name: item.name,
       type: convertFrameType(item.frameType),
       itemType: item.itemType,
       identified: item.identified,
@@ -75,6 +73,7 @@ class itemAdapter {
     if (item.typeLine) newItem.baseType = item.typeLine;
     if (item.influences) convertInfluences(newItem.influences);
     if (quality) newItem.quality = quality;
+    // TODO: ADD GEM LEVEL
     if (item.sockets) newItem.sockets = convertSockets(item.sockets);
 
     return newItem;
@@ -89,4 +88,4 @@ class itemAdapter {
   }
 }
 
-module.exports = itemAdapter;
+module.exports = ItemAdapter;

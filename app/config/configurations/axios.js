@@ -52,7 +52,7 @@ async function requestInterceptor(request, logger) {
       });
     }
   }
-  logger.info(`${cachedResponse ? 'CACHE FOUND: ' : ''}requesting ${request.method} to ${request.url}`);
+  logger.info(`${cachedResponse ? 'CACHE FOUND: ' : ''}requesting ${request.method} to ${request.url.substring(0, 10)}...`);
   return request;
 }
 
@@ -62,7 +62,7 @@ async function responseInterceptor(response, logger) {
     const key = buildRequestUrl(response.config);
     setCacheResponse(key, response, logger);
   }
-  logger.info(`${shouldCache ? 'CACHED: ' : ''}${response.cached ? 'FROM CACHE ' : ''}response status ${response.status} from ${response.config.url}`);
+  logger.info(`${shouldCache ? 'CACHED: ' : ''}${response.cached ? 'FROM CACHE ' : ''}response status ${response.status} from ${response.config.url.substring(0, 10)}...`);
   return response;
 }
 

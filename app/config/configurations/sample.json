@@ -4,6 +4,9 @@
   "POE_NINJA_URL" : "https://poe.ninja",
   "ITEM_TYPE_URL" : "/api/data/itemoverview",
   "STASH_API_URL": "/character-window/get-stash-items",
+  "TRADE_API_URL": "/api/trade/search/",
+  "TRADE_FETCH_API_URL": "/api/trade/fetch/",
+  "PRICE_INTERVAL": 600,
   "POESESSID": "",
   "ACCOUNT": "",
   "LEAGUE": ""
