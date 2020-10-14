@@ -12,6 +12,7 @@ function convertStash(stash) {
     i: stash.i,
     type: stash.type,
     id: stash.id,
+    colour: stash.colour,
   };
 }
 

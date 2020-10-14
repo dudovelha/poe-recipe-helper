@@ -1,29 +1,38 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const { BrowserWindow } = require('electron');
+const { logger } = require('../../config/manager');
 
 const INITIAL_X = 16;
 const INITIAL_Y = 161;
 const SQUARE_SIZE = { w: 52.5, h: 52.5 };
 let win;
 
-function createWindow() {
+async function createWindow() {
   const newWin = new BrowserWindow({
     fullscreen: true,
     frame: false,
-    toolbar: false,
     transparent: true,
     icon: false,
     skipTaskbar: true,
-    focusable: false,
+    // focusable: false,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
     },
   });
-  newWin.setIgnoreMouseEvents(true, { forward: true });
-  newWin.setAlwaysOnTop(true, 'screen');
+  const promise = new Promise((resolve, reject) => {
+    newWin.webContents.on('did-finish-load', () => {
+      resolve(newWin);
+    });
+  });
+  // newWin.setIgnoreMouseEvents(true, { forward: true });
+  // newWin.setAlwaysOnTop(true, 'screen');
   newWin.setPosition(0, 0);
   newWin.loadFile(`${__dirname}/html/index.html`);
-  return newWin;
+  newWin.show();
+
+  // newWin.webContents.openDevTools();
+  return promise;
 }
 
 function getPosition(pos, squareSize) {
@@ -41,15 +50,13 @@ function getSize(size, squareSize) {
 }
 
 class NotificationWindow {
-  static create() {
-    win = createWindow();
+  static async getWindow() {
+    if (!win) win = await createWindow();
+    return win;
   }
 
-  static close() {
-    win.close();
-  }
-
-  static highlight(position, size, scale, price) {
+  static async highlight(position, size, scale, price) {
+    if (!win) await this.getWindow();
     const squareSize = {
       w: SQUARE_SIZE.w * scale,
       h: SQUARE_SIZE.h * scale,

@@ -1,0 +1,18 @@
+body {
+  margin: 0px;
+  pointer-events: none;
+}
+
+body * {
+  pointer-events: all;
+}
+
+.highlight {
+  border: 1px solid darkslateblue;
+  background-color: #8080804D;
+  border-radius: 5px;
+}
+
+.highlighted {
+  background-color:  #808080c0 !important;
+}

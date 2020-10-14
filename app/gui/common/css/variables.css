@@ -1,0 +1,46 @@
+:root {
+  --color-background: #444461;
+  --color-background-alternate: #7A7AD6;
+  --color-border: #A7A7DB;
+  --color-text: #A3A3E3;
+  --color-text-alternate:  #F7F7FC;
+}
+
+* {
+  font-family: roboto;
+}
+
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem 0.5rem 0px 0px;
+  background-color: var(--color-background-alternate);
+  color: var(--color-text-alternate);
+  height: 14%;
+}
+
+.title {
+  flex-grow: 1;
+  margin: 5px 0px 5px 20px;
+}
+
+.body {
+  border-radius: 0px 0px 0.5rem 0.5rem;
+  text-align: center;
+  padding: 30px 2px 0px 2px;
+  height: 80%;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+@font-face {
+  font-family: roboto;
+  src: url('./../fonts/RobotoMono.ttf');
+}
+
+@font-face {
+  font-family: oldstandard;
+  src: url('./../fonts/OldStandardTT.ttf');
+}

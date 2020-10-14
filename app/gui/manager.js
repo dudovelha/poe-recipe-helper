@@ -1,12 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const {
-  app, globalShortcut,
-} = require('electron');
+const { app, globalShortcut } = require('electron');
 const notificationWindow = require('./notification/window');
+const menuWindow = require('./menu/window');
+const configWindow = require('./config/window');
 const logger = require('../config/configurations/logger');
+const { create } = require('./notification/window');
 
 function registerShortcuts() {
-  globalShortcut.register('Control+C', () => { app.exit(); });
+  globalShortcut.register('Control+Alt+C', () => { app.exit(); });
 }
 
 class GuiManager {
@@ -14,15 +15,18 @@ class GuiManager {
     return new Promise((resolve, reject) => {
       app.whenReady().then(() => {
         registerShortcuts();
-        notificationWindow.create();
         resolve();
       }).catch(reject);
     });
   }
 
-  static highlight(stash, item) {
+  static async highlight(stash, item) {
     const scale = stash.type === 'QuadStash' ? 0.5 : 1;
-    notificationWindow.highlight(item.position, item.size, scale, item.price);
+    await notificationWindow.highlight(item.position, item.size, scale, item.price);
+  }
+
+  static async configure() {
+    await configWindow.getWindow();
   }
 }
 
