@@ -25,6 +25,7 @@ class priceFacade {
       const prices = tradeObjects.map((object) => ({
         amount: object.listing.price.amount,
         currency: object.listing.price.currency,
+        seller: object.listing.account.lastCharacterName,
       }));
 
       newItem = { price: prices, ...item };

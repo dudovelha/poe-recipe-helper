@@ -22,7 +22,12 @@ class GuiManager {
 
   static async highlight(stash, item) {
     const scale = stash.type === 'QuadStash' ? 0.5 : 1;
-    await notificationWindow.highlight(item.position, item.size, scale, item.price);
+    await notificationWindow.highlight(
+      item.position,
+      item.size,
+      scale,
+      item.price.slice(0, (1 + Math.round(Math.random() * 9))),
+    );
   }
 
   static async configure() {

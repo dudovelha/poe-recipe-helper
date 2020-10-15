@@ -1,18 +1,34 @@
-const { config, axios } = require('../config/manager');
+const { config, axios, logger } = require('../config/manager');
 const priceQueryBuilder = require('./priceQueryBuilder');
 
 const requestQueue = [];
+let requestIntervalFn;
+
+function intercept(error, requestObj) {
+  debugger;
+  logger.error(error.toString());
+  if (error.response.status === 429) {
+    clearInterval(requestIntervalFn);
+    // eslint-disable-next-line no-use-before-define
+    requestIntervalFn = setInterval(startRequesting, 60 * 1000);
+    requestQueue.unshift(requestObj);
+  } else {
+    requestObj.reject();
+  }
+}
 
 function request() {
   const nextRequest = requestQueue.shift();
   if (nextRequest) {
     axios.poe[nextRequest.method](nextRequest.url, nextRequest.params)
       .then(nextRequest.resolve)
-      .catch(nextRequest.reject);
+      .catch((error) => { intercept(error, nextRequest); });
   }
 }
 
-setInterval(request, config.PRICE_INTERVAL);
+function startRequesting() {
+  requestIntervalFn = setInterval(request, config.PRICE_INTERVAL);
+}
 
 class PriceAPI {
   static async getTradeIds(item) {
@@ -49,7 +65,7 @@ class PriceAPI {
       resolve: promiseResolve,
       reject: promiseReject,
     };
-    requestQueue.push(requestObj);
+    requestQueue.unshift(requestObj);
     const response = await requestPromise;
     return response.data.result;
   }
@@ -59,4 +75,5 @@ class PriceAPI {
   }
 }
 
+startRequesting();
 module.exports = PriceAPI;

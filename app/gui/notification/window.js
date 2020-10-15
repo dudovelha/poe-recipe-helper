@@ -14,7 +14,7 @@ async function createWindow() {
     transparent: true,
     icon: false,
     skipTaskbar: true,
-    // focusable: false,
+    focusable: false,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -25,8 +25,8 @@ async function createWindow() {
       resolve(newWin);
     });
   });
-  // newWin.setIgnoreMouseEvents(true, { forward: true });
-  // newWin.setAlwaysOnTop(true, 'screen');
+  newWin.setIgnoreMouseEvents(true, { forward: true });
+  newWin.setAlwaysOnTop(true, 'screen');
   newWin.setPosition(0, 0);
   newWin.loadFile(`${__dirname}/html/index.html`);
   newWin.show();
@@ -55,18 +55,20 @@ class NotificationWindow {
     return win;
   }
 
-  static async highlight(position, size, scale, price) {
+  static async highlight(position, size, scale, price, recipe) {
     if (!win) await this.getWindow();
     const squareSize = {
       w: SQUARE_SIZE.w * scale,
       h: SQUARE_SIZE.h * scale,
     };
 
+    logger.info(`highlighting position ${JSON.stringify(position)} size ${JSON.stringify(size)} price ${!!price} recipe ${!!recipe}`);
     win.webContents.send('highlight',
       {
         position: getPosition(position, squareSize),
         size: getSize(size, squareSize),
         price,
+        recipe,
       });
   }
 }

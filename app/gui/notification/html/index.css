@@ -1,5 +1,12 @@
 body {
   margin: 0px;
+  overflow: hidden;
+}
+
+img {
+  max-width: 100%;
+  width: 50%;
+  text-align: left;
 }
 
 .highlight {
@@ -7,7 +14,8 @@ body {
   background-color: var(--color-background);
   border-radius: 5px;
   color: var(--color-text);
-  opacity: 0.5;
+  opacity: 0.8;
+  box-shadow: 2px 2px black;
 }
 
 .highlighted {
@@ -15,12 +23,23 @@ body {
   color: var(--color-text-alternate);
 }
 
+.price-body {
+  padding: 0px;
+  height: fit-content;
+  box-shadow: 10px 10px 20px #242424;
+}
+
 .price {
   position: absolute;
-  top: 30%;
-  left: 60%;
   width: 15%;
   height: 40%;
+  animation-name: pop;
+  animation-duration: 0.5s;
+}
+
+.price-delete {
+  animation-name: delete;
+  animation-duration: 0.5s;
 }
 
 .container {
@@ -41,19 +60,61 @@ body {
   font-family: oldstandard;
   font-weight: bold;
   font-size: 1.8rem;
+  text-align: right;
 }
 
 .list {
-  height: 10%;
+  width: 100%;
+  padding: 10px 0px 10px 0px;
+  margin: 0px 0px 10px 0px;
 }
 
 .list-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  text-align: right;
+  height: 10%;
 }
 
-.list-item {
+.list-item:not(:last-child) {
+  border-bottom: 2px solid var(--color-background-alternate);
+}
+
+.list-item * {
   flex: 1;
+  font-family: oldstandard;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0px 2px 0px 2px;
+}
+
+.list-item div:first-child {
+  text-align: right;
+}
+
+.list-item div:not(:first-child) {
+  text-align: left;
+}
+
+.image-replacement {
+  font-family: roboto;
+}
+
+@keyframes pop {
+  from {
+    transform: rotate(45deg) scale(0.1);
+  }
+  to {
+    transform: rotate(0deg) scale(1.0);
+  }
+}
+
+@keyframes delete {
+  from {
+    margin-left: 0%;
+  }
+  to {
+    margin-left: 100%;
+  }
 }

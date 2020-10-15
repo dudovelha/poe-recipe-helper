@@ -12,10 +12,14 @@ async function init() {
   const stash = await stashFacade.getStash({ n: '1' });
   const items = await itemFacade.getItemsFromStash(stash);
   const uniques = items.filter((item) => item.type === 'unique');
-  const pricedItem = await priceFacade.priceItem(uniques[0]);
-  const pricedItem2 = await priceFacade.priceItem(uniques[1]);
-  await gui.highlight(stash, pricedItem);
-  await gui.highlight(stash, pricedItem2);
+  await Promise.all(uniques.map((unique) => new Promise((resolve, reject) => {
+    priceFacade.priceItem(unique)
+      .then((pricedItem) => {
+        gui.highlight(stash, pricedItem);
+        resolve();
+      })
+      .catch(reject);
+  })));
   gui.configure();
 }
 

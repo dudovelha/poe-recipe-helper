@@ -1,3 +1,11 @@
+const fs = require('fs');
+
+function transitioned(event) {
+  if (event.animationName === 'delete') {
+    document.body.removeChild(event.target);
+  }
+}
+
 function addPrices(list, prices) {
   const container = document.createElement('ul');
   container.classList.add('list');
@@ -7,15 +15,25 @@ function addPrices(list, prices) {
 
     const amount = document.createElement('div');
     const imageContainer = document.createElement('div');
-    const image = document.createElement('img');
+    const seller = document.createElement('div');
+    let image = document.createElement('img');
 
-    image.classList.add('image');
+    // image.classList.add('image');
 
-    amount.textContent = `${price.amount} x ${price.currency}`;
-    image.src = `${__dirname}/currency/${price.currency}.png`;
+    amount.textContent = price.amount;
+    seller.textContent = price.seller;
+    const imageSrc = `${__dirname}/currency/${price.currency}.png`;
+    if (fs.existsSync(imageSrc)) {
+      image.src = imageSrc;
+    } else {
+      image = document.createElement('div');
+      image.textContent = price.currency;
+      image.classList.add('image-replacement');
+    }
 
     priceEl.appendChild(amount);
     priceEl.appendChild(imageContainer);
+    priceEl.appendChild(seller);
     imageContainer.appendChild(image);
 
     container.appendChild(priceEl);
@@ -23,42 +41,47 @@ function addPrices(list, prices) {
   list.appendChild(container);
 }
 
-function buildList(priceList, prices) {
+function getPriceList(prices) {
+  const priceList = document.createElement('div');
   const header = document.createElement('div');
   const list = document.createElement('div');
 
-  priceList.classList.add('frame');
   priceList.classList.add('price');
   header.classList.add('header');
   list.classList.add('body');
-
+  list.classList.add('price-body');
   addPrices(list, prices);
 
   header.textContent = 'Price asc';
 
   priceList.appendChild(header);
   priceList.appendChild(list);
-  priceList.setAttribute('id', 'price-list');
+  priceList.setAttribute('name', 'price-list');
+  priceList.style.top = `${25 + (Math.random() * 20)}%`; // 30
+  priceList.style.left = `${55 + (Math.random() * 20)}%`; // 60
+
+  return priceList;
 }
 
-function clearChildren(element) {
-  while (element.lastElementChild) {
-    element.removeChild(element.lastElementChild);
+function clearPriceList() {
+  const elements = document.getElementsByName('price-list');
+  if (elements) {
+    elements.forEach((element) => {
+      element.classList.add('price-delete');
+    });
   }
 }
 
 function createPriceList(div, price) {
+  clearPriceList();
   const highlighted = document.body.querySelector('.highlighted');
-  let priceList = document.body.querySelector('#price-list');
   if (highlighted) highlighted.classList.remove('highlighted');
-  if (priceList) document.body.removeChild(priceList);
 
-  priceList = document.createElement('div');
   div.classList.add('highlighted');
 
-  clearChildren(priceList);
-  buildList(priceList, price);
+  const priceList = getPriceList(price);
 
+  priceList.addEventListener('animationend', transitioned);
   document.body.append(priceList);
 }
 
@@ -98,7 +121,9 @@ class HighlightCreator {
     const div = createSquare(pos, size, priceList[0]);
 
     div.onmouseenter = () => {
-      createPriceList(div, priceList);
+      if (!div.classList.contains('highlighted')) {
+        createPriceList(div, priceList);
+      }
     };
 
     return div;

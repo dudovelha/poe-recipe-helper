@@ -5,7 +5,7 @@
   "STASH_API_URL": "/character-window/get-stash-items",
   "TRADE_API_URL": "/api/trade/search/",
   "TRADE_FETCH_API_URL": "/api/trade/fetch/",
-  "PRICE_INTERVAL": 600,
+  "PRICE_INTERVAL": 1600,
   "POESESSID": "",
   "ACCOUNT": "",
   "LEAGUE": ""
