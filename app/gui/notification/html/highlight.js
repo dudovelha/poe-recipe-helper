@@ -18,8 +18,6 @@ function addPrices(list, prices) {
     const seller = document.createElement('div');
     let image = document.createElement('img');
 
-    // image.classList.add('image');
-
     amount.textContent = price.amount;
     seller.textContent = price.seller;
     const imageSrc = `${__dirname}/currency/${price.currency}.png`;
@@ -44,16 +42,19 @@ function addPrices(list, prices) {
 function getPriceList(prices) {
   const priceList = document.createElement('div');
   const header = document.createElement('div');
+  const headerText = document.createElement('h2');
   const list = document.createElement('div');
 
   priceList.classList.add('price');
   header.classList.add('header');
+  headerText.classList.add('title');
   list.classList.add('body');
   list.classList.add('price-body');
   addPrices(list, prices);
 
-  header.textContent = 'Price asc';
+  headerText.textContent = 'Price asc';
 
+  header.appendChild(headerText);
   priceList.appendChild(header);
   priceList.appendChild(list);
   priceList.setAttribute('name', 'price-list');

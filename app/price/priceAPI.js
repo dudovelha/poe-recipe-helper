@@ -5,9 +5,9 @@ const requestQueue = [];
 let requestIntervalFn;
 
 function intercept(error, requestObj) {
-  debugger;
   logger.error(error.toString());
   if (error.response.status === 429) {
+    // this means we exceeded the api rate limit, pause for a minute and continue
     clearInterval(requestIntervalFn);
     // eslint-disable-next-line no-use-before-define
     requestIntervalFn = setInterval(startRequesting, 60 * 1000);
@@ -21,7 +21,11 @@ function request() {
   const nextRequest = requestQueue.shift();
   if (nextRequest) {
     axios.poe[nextRequest.method](nextRequest.url, nextRequest.params)
-      .then(nextRequest.resolve)
+      .then((response) => {
+        nextRequest.resolve(response);
+        // bypasses the timeout in case the response came from the cache
+        if (response.cached) request();
+      })
       .catch((error) => { intercept(error, nextRequest); });
   }
 }

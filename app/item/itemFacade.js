@@ -1,7 +1,7 @@
 const { logger } = require('../config/manager');
-const itemDB = require('./itemDB');
-const itemAPI = require('./itemAPI');
-const stashFacade = require('../stash/stashFacade');
+const ItemDB = require('./itemDB');
+const ItemAPI = require('./itemAPI');
+const StashFacade = require('../stash/stashFacade');
 
 function removeDuplicates(array) {
   const newArray = [];
@@ -15,30 +15,30 @@ function removeDuplicates(array) {
 
 class ItemFacade {
   static async insertOrUpdateItem(item) {
-    const itemInDb = await itemDB.getItem({ id: item.id });
+    const itemInDb = await ItemDB.getItem({ id: item.id });
     if (itemInDb) {
       logger.info(`updating item ${item.name} ${item.typeLine}`);
-      await itemDB.updateItem(item);
+      await ItemDB.updateItem(item);
     } else {
       logger.info(`inserting item ${item.name} ${item.typeLine}`);
-      itemDB.insertItem(item);
+      ItemDB.insertItem(item);
     }
   }
 
   static async insertOrUpdateItemType(itemType) {
-    const itemTypeInDb = await itemDB.getItemType({ id: itemType.name });
+    const itemTypeInDb = await ItemDB.getItemType({ id: itemType.name });
     if (itemTypeInDb) {
       logger.info(`updating itemType ${itemType.name}`);
-      await itemDB.updateItemType(itemType);
+      await ItemDB.updateItemType(itemType);
     } else {
       logger.info(`inserting itemType ${itemType.name}`);
-      itemDB.insertItemType(itemType);
+      ItemDB.insertItemType(itemType);
     }
   }
 
   static async addItemTypeToItem(item) {
     const newItem = item;
-    const itemType = await itemDB.getItemType({ baseType: item.typeLine });
+    const itemType = await ItemDB.getItemType({ baseType: item.typeLine });
     if (itemType) {
       newItem.itemType = itemType.itemType;
     }
@@ -46,7 +46,7 @@ class ItemFacade {
   }
 
   static async getUpdatedItemsFromStash(stash) {
-    const items = await itemAPI.getItemsFromTab(stash.i);
+    const items = await ItemAPI.getItemsFromTab(stash.i);
     const itemsWithStashIds = [];
     items.forEach((item) => {
       itemsWithStashIds.push({
@@ -62,9 +62,9 @@ class ItemFacade {
   }
 
   static async updateItems(forceUpdate) {
-    const hasItems = await itemDB.countItems() > 0;
+    const hasItems = await ItemDB.countItems() > 0;
     if (!hasItems || forceUpdate) {
-      const stashes = await stashFacade.getStashes();
+      const stashes = await StashFacade.getStashes();
       const itemsArray = await this.getUpdatedItemsFromStashes(stashes);
       const items = itemsArray.reduce((list, itemList) => list.concat(itemList), []);
       await Promise.all(items.map(this.insertOrUpdateItem.bind(this)));
@@ -72,9 +72,9 @@ class ItemFacade {
   }
 
   static async updateItemTypes(forceUpdate) {
-    const hasItemTypes = await itemDB.countItemTypes() > 0;
+    const hasItemTypes = await ItemDB.countItemTypes() > 0;
     if (!hasItemTypes || forceUpdate) {
-      const itemTypes = await itemAPI.getItemTypes();
+      const itemTypes = await ItemAPI.getItemTypes();
       if (itemTypes) {
         const nonDuplicatedItemTypes = removeDuplicates(itemTypes);
         await Promise.all(nonDuplicatedItemTypes.map(this.insertOrUpdateItemType.bind(this)));
@@ -83,7 +83,7 @@ class ItemFacade {
   }
 
   static async getItemsFromStash(stash) {
-    return itemDB.getItems({ stashId: stash.id });
+    return ItemDB.getItems({ stashId: stash.id });
   }
 }
 

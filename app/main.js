@@ -6,6 +6,7 @@ const gui = require('./gui/manager');
 
 async function init() {
   await gui.init();
+  gui.configure();
   await itemFacade.updateItemTypes();
   await stashFacade.updateStashTabs();
   await itemFacade.updateItems();
@@ -20,7 +21,6 @@ async function init() {
       })
       .catch(reject);
   })));
-  gui.configure();
 }
 
 init();

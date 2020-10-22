@@ -13,6 +13,7 @@ function registerShortcuts() {
 class GuiManager {
   static init() {
     return new Promise((resolve, reject) => {
+      app.on('window-all-closed', (e) => e.preventDefault());
       app.whenReady().then(() => {
         registerShortcuts();
         resolve();
@@ -26,7 +27,7 @@ class GuiManager {
       item.position,
       item.size,
       scale,
-      item.price.slice(0, (1 + Math.round(Math.random() * 9))),
+      item.price,
     );
   }
 

@@ -1,23 +1,23 @@
-const priceAPI = require('./priceAPI');
-const itemFacade = require('../item/itemFacade');
-const stashFacade = require('../stash/stashFacade');
+const PriceAPI = require('./priceAPI');
+const ItemFacade = require('../item/itemFacade');
+const StashFacade = require('../stash/stashFacade');
 
 class priceFacade {
   static async priceStashes() {
-    const stashes = await stashFacade.getStashes();
+    const stashes = await StashFacade.getStashes();
     return Promise.all(stashes.map(this.priceStash));
   }
 
   static async priceStash(stash) {
-    const items = await itemFacade.getItemsFromStash(stash);
+    const items = await ItemFacade.getItemsFromStash(stash);
     await Promise.all(items.map(this.priceItem));
   }
 
   static async priceItem(item, forceUpdate) {
     let newItem = item;
     if (!item.price || forceUpdate) {
-      const tradeQuery = await priceAPI.getTradeIds(item);
-      const tradeObjects = await priceAPI.getTradeObjects(
+      const tradeQuery = await PriceAPI.getTradeIds(item);
+      const tradeObjects = await PriceAPI.getTradeObjects(
         tradeQuery.id,
         tradeQuery.results.slice(0, 10),
       );
@@ -29,13 +29,13 @@ class priceFacade {
       }));
 
       newItem = { price: prices, ...item };
-      await itemFacade.insertOrUpdateItemType(newItem);
+      await ItemFacade.insertOrUpdateItemType(newItem);
     }
     return newItem;
   }
 
   static getPricingPoolSize() {
-    return priceAPI.getPricePool().length;
+    return PriceAPI.getPricePool().length;
   }
 }
 
