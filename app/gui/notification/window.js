@@ -5,7 +5,7 @@ const { logger } = require('../../config/manager');
 const INITIAL_X = 16;
 const INITIAL_Y = 161;
 const SQUARE_SIZE = { w: 52.5, h: 52.5 };
-let win;
+let win; let creatingWindow;
 
 async function createWindow() {
   const newWin = new BrowserWindow({
@@ -22,6 +22,7 @@ async function createWindow() {
   });
   const promise = new Promise((resolve, reject) => {
     newWin.webContents.on('did-finish-load', () => {
+      logger.info('highlight window created');
       resolve(newWin);
     });
   });
@@ -51,7 +52,14 @@ function getSize(size, squareSize) {
 
 class NotificationWindow {
   static async getWindow() {
-    if (!win) win = await createWindow();
+    if (!creatingWindow) {
+      creatingWindow = true;
+      win = await createWindow();
+    } else if (!win) {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => { this.getWindow().then(resolve).catch(reject); }, 250);
+      });
+    }
     return win;
   }
 
@@ -62,7 +70,6 @@ class NotificationWindow {
       h: SQUARE_SIZE.h * scale,
     };
 
-    logger.info(`highlighting position ${JSON.stringify(position)} size ${JSON.stringify(size)} price ${!!price} recipe ${!!recipe}`);
     win.webContents.send('highlight',
       {
         position: getPosition(position, squareSize),

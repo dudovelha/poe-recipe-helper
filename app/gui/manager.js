@@ -23,6 +23,7 @@ class GuiManager {
 
   static async highlight(stash, item) {
     const scale = stash.type === 'QuadStash' ? 0.5 : 1;
+    logger.info(`highlighting ${item.baseType} on position ${JSON.stringify(item.position)} size ${JSON.stringify(item.size)} price ${!!item.price} recipe ${!!item.recipe}`);
     await notificationWindow.highlight(
       item.position,
       item.size,

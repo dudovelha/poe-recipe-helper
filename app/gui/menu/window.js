@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const { BrowserWindow } = require('electron');
 
-let win;
+let win; let creatingWindow;
 
 async function createWindow() {
   const newWin = new BrowserWindow({
@@ -33,7 +33,14 @@ async function createWindow() {
 
 class MenuWindow {
   static async getWindow() {
-    if (!win) win = await createWindow();
+    if (!creatingWindow) {
+      creatingWindow = true;
+      win = await createWindow();
+    } else if (!win) {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => { this.getWindow().then(resolve).catch(reject); }, 250);
+      });
+    }
     return win;
   }
 }

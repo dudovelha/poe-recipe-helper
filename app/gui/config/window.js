@@ -4,7 +4,7 @@ const configManager = require('../../config/manager');
 
 const WINDOW_WIDTH = 500;
 const WINDOW_HEIGHT = 500;
-let win;
+let win; let creatingWindow;
 
 function updateConfigMessage(event, args) {
   configManager.updateConfig(args);
@@ -53,7 +53,14 @@ async function createWindow() {
 
 class ConfigWindow {
   static async getWindow() {
-    if (!win) win = await createWindow();
+    if (!creatingWindow) {
+      creatingWindow = true;
+      win = await createWindow();
+    } else if (!win) {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => { this.getWindow().then(resolve).catch(reject); }, 250);
+      });
+    }
     return win;
   }
 }

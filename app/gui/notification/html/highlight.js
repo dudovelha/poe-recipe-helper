@@ -109,8 +109,8 @@ function createSquare(pos, size, price) {
   div.style.position = 'absolute';
   div.style.top = pos.y;
   div.style.left = pos.x;
-  div.style.width = size.w;
-  div.style.height = size.h;
+  div.style.width = size.w - 5;
+  div.style.height = size.h - 5;
 
   const priceHint = createPriceHint(price);
   div.appendChild(priceHint);
