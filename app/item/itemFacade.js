@@ -62,8 +62,9 @@ class ItemFacade {
   }
 
   static async updateItems(forceUpdate) {
+    if (forceUpdate) await ItemDB.clearItemDB();
     const hasItems = await ItemDB.countItems() > 0;
-    if (!hasItems || forceUpdate) {
+    if (!hasItems) {
       const stashes = await StashFacade.getStashes();
       const itemsArray = await this.getUpdatedItemsFromStashes(stashes);
       const items = itemsArray.reduce((list, itemList) => list.concat(itemList), []);

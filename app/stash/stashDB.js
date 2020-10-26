@@ -72,6 +72,15 @@ class StashDB {
       });
     });
   }
+
+  static clearDB() {
+    return new Promise((resolve, reject) => {
+      db.remove({}, { multi: true }, (err, count) => {
+        if (err) reject(err);
+        resolve(count);
+      });
+    });
+  }
 }
 
 module.exports = StashDB;

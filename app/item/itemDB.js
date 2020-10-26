@@ -125,6 +125,24 @@ class ItemDB {
       });
     });
   }
+
+  static clearItemDB() {
+    return new Promise((resolve, reject) => {
+      db.item.remove({}, { multi: true }, (err, count) => {
+        if (err) reject(err);
+        resolve(count);
+      });
+    });
+  }
+
+  static clearItemTypeDB() {
+    return new Promise((resolve, reject) => {
+      db.itemType.remove({}, { multi: true }, (err, count) => {
+        if (err) reject(err);
+        resolve(count);
+      });
+    });
+  }
 }
 
 module.exports = ItemDB;

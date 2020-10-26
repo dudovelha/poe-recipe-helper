@@ -6,7 +6,7 @@ let requestIntervalFn;
 
 function intercept(error, requestObj) {
   logger.error(error.toString());
-  if (error.response.status === 429) {
+  if (error.response && error.response.status === 429) {
     // this means we exceeded the api rate limit, pause for a minute and continue
     clearInterval(requestIntervalFn);
     // eslint-disable-next-line no-use-before-define

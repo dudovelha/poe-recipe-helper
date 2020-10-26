@@ -42,6 +42,7 @@ function buildCorruptionFilter(corrupted) {
 }
 
 function buildCurrencyRequest(item) {
+  return buildUniqueRequest(item);
 }
 
 function buildUniqueRequest(item) {

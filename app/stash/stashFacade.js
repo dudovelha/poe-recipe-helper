@@ -35,8 +35,9 @@ class StashFacade {
   }
 
   static async updateStashTabs(forceUpdate) {
+    if (forceUpdate) await StashDB.clearDB();
     const hasStashTabs = await StashDB.countStashTabs() > 0;
-    if (!hasStashTabs || forceUpdate) {
+    if (!hasStashTabs) {
       const stashes = await StashAPI.getStashTabs();
       if (stashes) {
         await Promise.all(stashes.map(this.insertOrUpdateStahTab));

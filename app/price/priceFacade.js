@@ -1,6 +1,7 @@
 const PriceAPI = require('./priceAPI');
 const ItemFacade = require('../item/itemFacade');
 const StashFacade = require('../stash/stashFacade');
+const { logger } = require('../config/manager');
 
 class priceFacade {
   static async priceStashes() {
@@ -16,20 +17,27 @@ class priceFacade {
   static async priceItem(item, forceUpdate) {
     let newItem = item;
     if (!item.price || forceUpdate) {
-      const tradeQuery = await PriceAPI.getTradeIds(item);
-      const tradeObjects = await PriceAPI.getTradeObjects(
-        tradeQuery.id,
-        tradeQuery.results.slice(0, 10),
-      );
+      try {
+        const tradeQuery = await PriceAPI.getTradeIds(item);
+        if (tradeQuery.results.length > 0) {
+          const tradeObjects = await PriceAPI.getTradeObjects(
+            tradeQuery.id,
+            tradeQuery.results.slice(0, 10),
+          );
 
-      const prices = tradeObjects.map((object) => ({
-        amount: object.listing.price.amount,
-        currency: object.listing.price.currency,
-        seller: object.listing.account.lastCharacterName,
-      }));
+          const prices = tradeObjects.map((object) => ({
+            amount: object.listing.price.amount,
+            currency: object.listing.price.currency,
+            seller: object.listing.account.lastCharacterName,
+          }));
 
-      newItem = { price: prices, ...item };
-      await ItemFacade.insertOrUpdateItemType(newItem);
+          newItem = { price: prices, ...item };
+          await ItemFacade.insertOrUpdateItemType(newItem);
+        }
+      } catch (err) {
+        logger.error(`could not price ${item.baseType}`);
+        newItem = item;
+      }
     }
     return newItem;
   }

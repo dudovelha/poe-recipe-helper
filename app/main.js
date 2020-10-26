@@ -9,14 +9,16 @@ async function init() {
   gui.configure();
   await itemFacade.updateItemTypes();
   await stashFacade.updateStashTabs();
-  await itemFacade.updateItems();
+  await itemFacade.updateItems(true);
   const stash = await stashFacade.getStash({ n: '1' });
   const items = await itemFacade.getItemsFromStash(stash);
-  const uniques = items.filter((item) => item.type === 'unique');
+  const uniques = items;
   await Promise.all(uniques.map((unique) => new Promise((resolve, reject) => {
     priceFacade.priceItem(unique)
-      .then((pricedItem) => {
-        gui.highlight(stash, pricedItem);
+      .then(async (pricedItem) => {
+        if (pricedItem.price) {
+          await gui.highlight(stash, pricedItem);
+        }
         resolve();
       })
       .catch(reject);
