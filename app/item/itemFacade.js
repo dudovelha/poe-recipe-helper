@@ -1,17 +1,8 @@
 const { logger } = require('../config/manager');
+const { removeArrayDuplicates } = require('../utils');
 const ItemDB = require('./itemDB');
 const ItemAPI = require('./itemAPI');
 const StashFacade = require('../stash/stashFacade');
-
-function removeDuplicates(array) {
-  const newArray = [];
-  array.forEach((newValue) => {
-    if (!newArray.some((value) => value.name === newValue.name)) {
-      newArray.push(newValue);
-    }
-  });
-  return newArray;
-}
 
 class ItemFacade {
   static async insertOrUpdateItem(item) {
@@ -73,11 +64,12 @@ class ItemFacade {
   }
 
   static async updateItemTypes(forceUpdate) {
+    if (forceUpdate) await ItemDB.clearItemTypeDB();
     const hasItemTypes = await ItemDB.countItemTypes() > 0;
-    if (!hasItemTypes || forceUpdate) {
+    if (!hasItemTypes) {
       const itemTypes = await ItemAPI.getItemTypes();
       if (itemTypes) {
-        const nonDuplicatedItemTypes = removeDuplicates(itemTypes);
+        const nonDuplicatedItemTypes = removeArrayDuplicates(itemTypes, 'name');
         await Promise.all(nonDuplicatedItemTypes.map(this.insertOrUpdateItemType.bind(this)));
       }
     }
