@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const { BrowserWindow } = require('electron');
-const { logger } = require('../../config/manager');
 
 const INITIAL_X = 16;
 const INITIAL_Y = 161;
@@ -22,7 +21,6 @@ async function createWindow() {
   });
   const promise = new Promise((resolve, reject) => {
     newWin.webContents.on('did-finish-load', () => {
-      logger.info('highlight window created');
       resolve(newWin);
     });
   });
